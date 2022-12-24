@@ -1,0 +1,45 @@
+IMPORTING DATA TO HIVE 
+
+1. Loading csv file to hive via an external table
+First, we will create the required directories in HDFS and then load flights.csv 
+to HDFS.
+
+➢ hdfs dfs -mkdir -p project/datasets/
+➢ hdfs dfs -put /home/ak/Downloads/flights.csv /project/datasets/
+
+ create an external table on hive to view this data.
+ 
+An external table is a table for which Hive does not manage storage. They are 
+an excellent way to manage data on the Hive since Hive does not have 
+ownership of the data stored inside External tables. In case, if the user drops 
+the External tables then only the metadata of tables will be removed and the 
+data will be safe.
+
+➢ hive
+➢ create database project;
+➢ use project;
+➢ CREATE EXTERNAL TABLE flights(YEAR int,MONTH int,DAY int, DAY_OF_WEEK 
+int, AIRLINE string,FLIGHT_NUMBER int, TAIL_NUMBER string, 
+ORIGIN_AIRPORT string, DESTINATION_AIRPORT string, 
+SCHEDULED_DEPARTURE int, DEPARTURE_TIME int, DEPARTURE_DELAY int, 
+TAXI_OUT int, WHEELS_OFF int,SCHEDULED_TIME int,ELAPSED_TIME int, 
+AIR_TIME int, DISTANCE int, WHEELS_ON int, TAXI_IN int, 
+SCHEDULED_ARRIVAL int,ARRIVAL_TIME int, ARRIVAL_DELAY int, DIVERTED 
+int, CANCELLED int, CANCELLATION_REASON string, 
+AIR_SYSTEM_DELAY int,SECURITY_DELAY int, AIRLINE_DELAY 
+int,LATE_AIRCRAFT_DELAY int, WEATHER_DELAY int) ROW FORMAT 
+DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE LOCATION 
+'/project/datasets/flights.csv' '
+➢ desc flights;
+➢ select * from flights limit 5;
+➢ ALTER TABLE flights SET TBLPROPERTIES ("skip.header.line.count"="1");
+➢ select * from flights limit 5;
+➢ select count(*) from flights;
+
+Next, we will load the external hive table into a spark data frame.
+➢ flights_table = spark.read.table('project.flights')
+➢ flights_table.count()
+➢ flights_df = spark.sql('select * from project.flights')
+➢ flights_df.select("year","month","day","airline","origin_airport","destination_
+airport","airline_delay").show(10)
+
