@@ -1,0 +1,7 @@
+Loading the MySQL table into a spark dataframe :
+
+➢ airlinesdf=spark.read.format("jdbc").option("url","jdbc:mysql://localhost:33
+06/project?useSSL=false").option("driver","com.mysql.jdbc.Driver").option("
+dbtable", "airlines").option("user","ak").option("password", "ak").load()
+
+➢ airlinesdf.show();
