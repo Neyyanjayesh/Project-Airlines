@@ -1,0 +1,18 @@
+➢ pyspark --packages=org.apache.hadoop:hadoop-aws:2.7.3
+➢ hadoop_conf = spark._jsc.hadoopConfiguration()
+➢ hadoop_conf.set("fs.s3n.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem")
+➢ hadoop_conf.set("fs.s3n.awsAccessKeyId",'AKIAYLYEKLCYI7DILEU4')
+➢ hadoop_conf.set("fs.s3n.awsSecretAccessKey",'hLNi2nWaWHERa3x8spxCgxXKcgoHMq/m/MiZeW3Q')
+
+Now, we will read the stored file to a spark dataframe
+
+➢ from pyspark.sql.types import StructType, StructField, StringType, 
+DoubleType, IntegerType
+➢ airlinesSchema = StructType([
+StructField("IATA_CODE",StringType(),True),
+StructField("AIRLINE",StringType(),True),... ])
+
+➢ airlinesdf=spark.read.schema(airlinesSchema).csv("s3n://lti1033-teja/Datasets/airlines.csv",header=True,sep=",")
+
+Write data from spark to s3 : 
+➢ airlinesdf.write.format("csv").option("header","true").save("s3n://lti1033-teja/Datasets/airlines_write.csv",sep=",")
