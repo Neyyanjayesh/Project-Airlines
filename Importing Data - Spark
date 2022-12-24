@@ -1,0 +1,17 @@
+Load airports.csv from the local file system, and read it into a 
+spark dataframe.
+
+Before reading the table, we will first declare a user defined schema to enforce 
+the data type stays consistent. For this a few functions have to be imported.
+
+
+➢ from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+
+➢ airportsSchema = StructType([ StructField("IATA_CODE",StringType(),True), 
+StructField("AIRPORT",StringType(),True), 
+StructField("CITY",StringType(),True), StructField("STATE", StringType(), True), 
+StructField("COUNTRY", StringType(), True), StructField("LATITUDE", 
+DoubleType(), True), StructField("LONGITUDE",DoubleType(),True), ])
+
+➢ df = spark.read.csv("airports.csv",header=True,schema= airportsSchema)
+
