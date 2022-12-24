@@ -1,0 +1,16 @@
+➢ clean_flights_df.write.option("header",True).option("compression","gzip").c
+sv("file:///home/ak/project/outputs/fileFormats/compressed_gzip")
+
+➢ clean_flights_df.write.option("header",True).option("compression","bzip2").c
+sv("file:///home/ak/project/outputs/fileFormats/compressed_bzip2")
+
+➢ clean_flights_df.write.format("json").save("file:///home/ak/project/outputs/fi
+leFormats/json")
+
+➢ clean_flights_df.write.option("header",True).format("parquet").option("comp
+ression","snappy").save("file:///home/ak/project/outputs/fileFormats/parque
+t_snappy")
+
+➢ clean_flights_df.write.option("header",True).format("orc").option("compressi
+on","lzo").save("file:///home/ak/project/outputs/fileFormats/orc_lzo")
+
