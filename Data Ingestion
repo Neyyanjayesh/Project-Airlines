@@ -1,0 +1,38 @@
+Data Ingestion
+The data we will be using in this case study is the “2015 Flight Delays and 
+Cancellations” dataset from Kaggle. The dataset consists of three CSV files.
+
+1. flights.csv: Flights csv is the major file in this dataset which contains 
+over 5 million records of flight data in the United States for the year of 
+2015.
+
+2. airports.csv: Airports csv is a smaller file that contains a list of all the 
+active airports in the United States as of 2015.
+
+3. airlines.csv: Is a smaller file that contains the different operational 
+Airline Companies.
+
+There are multiple storage options to store data. The Hadoop distributed 
+file system offers a storage mechanism that makes use of partitioning and 
+storing data as blocks that are replicated to offer fault tolerance. The 
+different partitions are
+processed in parallel to provide faster computation time in a cluster of 
+machines.
+
+Hive is the data warehouse for hadoop.
+MySql is a relational database where data can be stored in table format 
+and connected to spark for analysis.
+
+Amazon s3 provides a cloud storage service which can directly be 
+connected to spark for batch data reading.
+This project makes use of all these storage mechanisms, which will be 
+explained in detail below.
+
+
+ =====================Dataset Details=====================
+Name of table Rows and Columns 
+Observed 
+airlines      [14 rows x 2 columns]
+airports      [322 rows x 7 columns] 
+flights       [5819079 rows x 31 
+columns]
