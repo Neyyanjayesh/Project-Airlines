@@ -1,0 +1,46 @@
+➢ pyspark --packages io.delta:delta-core_2.12:1.2.1 --conf
+➢ "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension" --conf
+➢ "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCat
+alog”
+
+Load data from hive:
+➢ flights_df = spark.sql('select * from project.flights')
+➢ clean_flights_df = flights_df.na.drop()
+
+Save dataframe as a delta table in hive database:
+➢ clean_flights_df.write.format("delta").saveAsTable("project.clean_flights_delta")
+➢ spark.sql("desc extended project.clean_flights_delta").show(100)
+
+Saving delta table in local: 
+➢ clean_flights_df.write.format("delta").save("file:///home/ak/project/deltaTables/clean_flights_delta")
+
+Creating the SQL table of this flight delta table using local storage
+➢ from delta.tables import *
+➢ from pyspark.sql.functions import *
+➢ spark.sql("CREATE TABLE flights_delta USING DELTA LOCATION 
+'file:///home/ak/project/deltaTables/clean_flights_delta'")
+
+➢ spark.sql("select AIRLINE, ORIGIN_AIRPORT, DESTINATION_AIRPORT from 
+flights_delta").show(15)
+
+Read delta table in spark :
+➢ clean_flights_delta_table = 
+DeltaTable.forPath(spark,"file:///home/ak/project/deltaTables/clean_flights
+_delta")
+
+Delete operation:
+➢ spark.sql("select count(*) from flights_delta where airline='AA'").show()
+➢ clean_flights_delta_table.delete(col('airline') == 'AA')
+➢ spark.sql("select count(*) from flights_delta where airline='AA'").show()
+
+Update Data in table:
+➢ spark.sql("select count(*) from flights_delta where 
+DESTINATION_AIRPORT='MCO'").show()
+➢ spark.sql("select count(*) from flights_delta where 
+DESTINATION_AIRPORT=’MIA’").show()
+➢ clean_flights_delta_table.update(col("DESTINATION_AIRPORT") == "MCO", 
+{"DESTINATION_AIRPORT" : lit("MIA")})
+➢ spark.sql("select count(*) from flights_delta where 
+DESTINATION_AIRPORT='MCO'").show()
+➢ spark.sql("select count(*) from flights_delta where 
+DESTINATION_AIRPORT=MIA").show()
