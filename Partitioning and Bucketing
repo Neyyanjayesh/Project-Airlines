@@ -1,0 +1,28 @@
+STATIC PARTITIONING:
+
+Partitioning clean_flights_df by month which will make it easier to access and 
+analyze data by month when required. This will be useful in analyzing up-times 
+in travel periods and downtimes in travel to plan business processes and 
+allocate resources accordingly.
+
+➢ create table static_flight(year INT, airline STRING, origin_airport STRING, 
+destination_airport STRING) partitioned by(month INT);
+➢ insert overwrite table static_flight partition(month=12) select year, airline, 
+origin_airport, destination_airport from clean_flights_df where month = 12;
+➢ select year, month, airline, origin_airport, destination_airport from 
+static_flight where month = 12 limit 10;
+
+DYNAMIC PARTITIONING:
+
+Partitioned clean_flights_df dynamically by month and then further by airline 
+company. Additionally to the above mentioned reasons, a further partition by 
+airline company will make it easier to analyze the performance of companies 
+in specific Months.
+
+➢ clean_flights_df.write.partitionBy("month","airline").save("/project/outputs/p
+artitionByMonthAirline")
+
+Bucketing:
+
+➢ clean_flights_df..write\.mode("overwrite")\.partitionBy("month","airline")\.bucketBy(5,"day")\
+.saveAsTable("project.partitonByMonthAirlineBucketByDay")
