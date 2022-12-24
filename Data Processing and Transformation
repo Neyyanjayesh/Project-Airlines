@@ -1,0 +1,132 @@
+➢ from pyspark.sql.types import StructType, StructField, StringType, 
+DoubleType, IntegerType
+
+Schema for airports.csv:
+➢ airportsSchema = StructType([
+ StructField("IATA_CODE",StringType(),True),
+ StructField("AIRPORT",StringType(),True),
+ StructField("CITY",StringType(),True),
+ StructField("STATE", StringType(), True),
+ StructField("COUNTRY", StringType(), True),
+ StructField("LATITUDE", DoubleType(), True),
+ StructField("LONGITUDE",DoubleType(),True),
+ ])
+ 
+Schema for airlines.csv:
+
+➢ airlinesSchema = StructType([
+ StructField("IATA_CODE",StringType(),True),
+ StructField("AIRLINE",StringType(),True),
+ ])
+ 
+Schema for flights.csv:
+
+➢ flightsSchema = StructType([
+ StructField("YEAR",IntegerType(),True),
+ StructField("MONTH",IntegerType(),True),
+ StructField("DAY",IntegerType(),True),
+ StructField("DAY_OF_WEEK",IntegerType(),True),
+ StructField("AIRLINE",StringType(),True),
+ StructField("FLIGHT_NUMBER",StringType(),True),
+ StructField("TAIL_NUMBER",StringType(),True),
+ StructField("ORIGIN_AIRPORT",StringType(),True),
+ StructField("DESTINATION_AIRPORT",StringType(),True),
+ StructField("SCHEDULED_DEPARTURE",IntegerType(),True),
+ StructField("DEPARTURE_TIME",IntegerType(),True),
+ StructField("DEPARTURE_DELAY",IntegerType(),True),
+ StructField("TAXI_OUT",IntegerType(),True),
+ StructField("WHEELS_OFF",IntegerType(),True),
+ StructField("SCHEDULED_TIME",IntegerType(),True),
+ StructField("ELAPSED_TIME",IntegerType(),True),
+ StructField("AIR_TIME",IntegerType(),True),
+ StructField("DISTANCE",IntegerType(),True),
+ StructField("WHEELS_ON",IntegerType(),True),
+ StructField("TAXI_IN",IntegerType(),True),
+ StructField("SCHEDULED_ARRIVAL",IntegerType(),True),
+ StructField("ARRIVAL_TIME",IntegerType(),True),
+ StructField("ARRIVAL_DELAY",IntegerType(),True),
+ StructField("DIVERTED",IntegerType(),True),
+ StructField("CANCELLED",IntegerType(),True),
+ StructField("CANCELLATION_REASON",IntegerType(),True),
+ StructField("AIR_SYSTEM_DELAY",IntegerType(),True),
+ StructField("SECURITY_DELAY",IntegerType(),True),
+ StructField("AIRLINE_DELAY",IntegerType(),True),
+ StructField("LATE_AIRCRAFT_DELAY",IntegerType(),True),
+ StructField("WEATHER_DELAY",IntegerType(),True),
+ ])
+
+Read flights data from hive table
+➢ flights_df = spark.sql('select * from project.flights')
+➢ flights_df=flights_df.na.fill('NULL')
+➢ flights_df= flights_df.na.replace("NA","NULL")
+➢ clean_flights_df = flights_df.na.drop()
+➢ clean_flights_df = clean_flights_df.dropDuplicates()
+
+Read airlines table from mysql
+➢ airlines_df=spark.read.format("jdbc").option("url","jdbc:mysql://localhost:330
+6/project?allowPublicKeyRetrieval=true&useSSL=false").option("driver","com.
+mysql.jdbc.Driver").option("dbtable", 
+"airlines").option("user","ak").option("password", "ak").load()
+➢ airlines_df=airlines_df.na.fill('NULL')
+➢ airlines_df= airlines_df.na.replace("NA","NULL")
+➢ clean_airlines_df = airlines_df.na.drop()
+➢ clean_ airlines _df = clean_airlines_df.dropDuplicates()
+
+ Read airpots data from csv file
+➢ airports_df=spark.read.csv("airports.csv",header=True,schema=airportsSche
+ma)
+➢ airports_df=airports_df.na.fill('NULL')
+➢ airports_df= airports_df.na.replace("NA","NULL")
+➢ clean_airports_df = airports_df.na.drop()
+➢ clean_ airports _df = clean_airports_df.dropDuplicates()
+➢ clean_flights_df.select("AIRLINE").show(5)
+
+clean_airlines_df.show(5)
+➢ Clean_airlines_df = clean_airlines_df. 
+withColumnRenamed("AIRLINE","AIRLINE_FULL_FORM").withColumnRenam
+ed("IATA_CODE","AIRLINE")
+➢ Clean_airlines_df.show(5)
+➢ joined_df = clean_flights_df.join(clean_airlines_df,"airline") // default is inner 
+join
+➢ joined_df.show(5)
+➢ Joined_df.printSchema()
+
+
+FULL JOIN:
+➢ clean_airports_df.join(clean_airlines_df, clean_airports_df.IATA_CODE==df_
+clean_airlines_df.IATA_CODE,"full").show()
+
+SELECT:
+➢ df_air.select("IATA_CODE","FLIGHT_NUMBER","ORIGIN_AIRPORT","DESTINA
+TION_AIRPORT").show()
+
+ADDING NEW COLUMN:
+Adding a new column called “CALC_DEP_TIME” which is the sum of 
+“DEPARTURE_DELAY” and SCHEDULED_DEPARTURE
+➢ clean_flights_df.withColumn("CALC_DEP_TIME", clean_flights_df 
+["DEPARTURE_DELAY"] + clean_flights_df
+["SCHEDULED_DEPARTURE"]).select("DEPARTURE_DELAY","SCHEDULED_DE
+PARTURE","CALC_DEP_TIME","DEPARTURE_TIME").show()
+
+GROUPBY:
+Find the number of Airports in each city.
+➢ clean_airports_df.groupby("CITY").count().show()
+
+GroupBy - AVG:
+Find the average of air time for “FLIGHT_NUMBER” 
+➢ clean_flights_df.groupby("FLIGHT_NUMBER").avg("AIR_TIME").orderBy("avg
+(AIR_TIME)",ascending=True).na.drop().show(10)
+
+GroupBy – MAX:
+To find which airline has more departure delay
+Groupby “AIRLINE” and find maximum of DEPARTURE_DELAY and orderby 
+DEPARTURE_DELAY in Descending order.
+
+➢ clean_flights_df.groupby("AIRLINE").max("DEPARTURE_DELAY").orderBy("m
+ax(DEPARTURE_DELAY)",ascending=False).show()
+
+FILTER:
+Select data in which 'ORIGIN_AIRPORT is "SEA"
+➢ clean_flights_df.select("FLIGHT_NUMBER","ORIGIN_AIRPORT","DESTINATIO
+N_AIRPORT","AIR_TIME","DISTANCE").filter('ORIGIN_AIRPORT=="SEA"').disti
+nct().orderBy("DESTINATION_AIRPORT",ascending=True).show()
