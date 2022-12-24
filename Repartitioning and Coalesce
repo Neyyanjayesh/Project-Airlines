@@ -1,0 +1,15 @@
+➢ no_of_partitions = clean_flights_df.rdd.getNumPartitions()
+➢ print(f"no_of_partitions are : {no_of_partitions}")
+
+Increase number of partitions using repartition:
+➢ clean_flights_df.repartition(10).write.csv("/project/outputs/repartition10_cl
+ean_flights")
+
+Repartitioning performs a full shuffle and partitions the data into roughly 
+equal sized blocks.
+
+Decreasing no of partitions using coalesce:
+➢ clean_flights_df.coalesce(1).write.csv("/project/outputs/coalesce1Output")
+
+Coalesce can only be used to reduce partitions as it does not perform a full 
+shuffle like repartition. It is also faster than repartition.
