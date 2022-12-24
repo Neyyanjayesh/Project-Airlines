@@ -1,0 +1,12 @@
+Load data into MySql from local csv file:
+
+➢ $ sudo mysql --local-infile=1 -u root -p
+➢ SET GLOBAL local_infile=1; // setting permissions to allow file reading
+
+➢ create database project;
+➢ show databases;
+➢ use airlines;
+➢ create table airlines(IATA_CODE VARCHAR(100),AIRLINE VARCHAR(100));
+➢ load data local infile '/home/ak/datasets/airlines.csv' into table airlines fields 
+terminated by ',' lines terminated by '\n' ignore 1 lines;
+➢ select * from airlines;
