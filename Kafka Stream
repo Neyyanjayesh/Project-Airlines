@@ -1,0 +1,77 @@
+Go to in every terminal cd kafka_2.12-3.0.0/bin
+
+1. Starting Zookeeper & Kafka
+➢ ./zookeeper-server-start.sh ../config/zookeeper.properties
+
+2. Starting Server
+➢ ./kafka-server-start.sh ../config/server.properties
+Run jps and check if kafka is running or not
+
+3. Create kafka topic
+➢ ./kafka-topics.sh --create --bootstrap-server localhost:9092 --replicationfactor 1 --partitions 1 --topic airlines
+
+4. To see running topics :
+➢ $ ./kafka-topics.sh --list --bootstrap-server localhost:9092
+Change config of kafka
+
+5. Create Producer Console:
+➢ $ ./kafka-console-producer.sh --broker-list localhost:9092 --topic airlines
+IATA_CODE,AIRLINE
+UA,United Air Lines Inc.
+AA,American Airlines Inc.
+US,US Airways Inc.
+F9,Frontier Airlines Inc.
+B6,JetBlue Airways
+OO,Skywest Airlines Inc.
+AS,Alaska Airlines Inc.
+NK,Spirit Air Lines
+WN,Southwest Airlines Co.
+DL,Delta Air Lines Inc.
+EV,Atlantic Southeast Airlines
+HA,Hawaiian Airlines Inc.
+MQ,American Eagle Airlines Inc.
+VX,Virgin America
+The python file , kafkaSpark.py : 
+from pyspark.sql.types import *
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+
+if __name__ == "__main__":
+# Set your local host to be the master node of your cluster
+# Set the appName for your Spark session
+# Join session for app if it exists, else create a new one
+spark = SparkSession.builder.master("local")\.appName("SparkStreaming")\.getOrCreate()
+ 
+# ERROR log level will generate fewer lines of output compared to INFO and DEBUG 
+
+spark.sparkContext.setLogLevel("ERROR")
+stream_df = spark \
+.readStream \
+.format("kafka") \
+.option("kafka.bootstrap.servers", "localhost:9092") \
+.option("subscribe", "airlines") \
+.option("startingOffsets", "earliest")\.load()
+stream_df _temp= df.selectExpr("CAST(value AS STRING)")
+stream_df_split= stream_df _temp.withColumn("IATA_CODE", 
+split(col("value"), ",").getItem(0)) \
+.withColumn("AIRLINE", split(col("value"), ",").getItem(1)).drop(“value”)
+stream_df _split.writeStream\
+.outputMode("append")\
+.format("console")\
+.option("truncate", "false")\
+.start()\
+.awaitTermination()
+
+Now run the .py file using spark-submit 
+➢ spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.0 
+kafkaSpark.py
+
+If we change the readStream : 
+Remove option("startingOffsets", "earliest") , then
+➢ stream_df = spark \
+.readStream \
+.format("kafka") \
+.option("kafka.bootstrap.servers", "localhost:9092") \
+.option("subscribe", "airlines") \
+.load()
